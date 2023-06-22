@@ -1,6 +1,7 @@
 from rest_framework import generics
 from django.shortcuts import get_object_or_404, render
 from .serializers import UserSerializer
+from .password_validators import SymbolValidator, LowercaseValidator, UppercaseValidator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,6 +14,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import check_password
 
 for user in User.objects.all():
     Token.objects.get_or_create(user=user)
@@ -84,6 +86,23 @@ class DeleteUserView(generics.DestroyAPIView):
         user.delete()
         return Response({'detail': 'User deleted successfully.'})
     
+class UpdateUserView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.kwargs['user_id'])
+
+    def get_object(self):
+        return self.get_queryset().first()
+
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
@@ -100,7 +119,51 @@ class LoginView(APIView):
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
         
         
+class UserChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request, user_id):
+        user = User.objects.get(id=user_id)
+
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if current_password == new_password:
+            return Response({'detail': 'New password must be different from current password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not check_password(current_password, user.password):
+            return Response({'detail': 'Current password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_password != confirm_password:
+            return Response({'detail': 'New password and confirm password do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(new_password) < 8:
+            return Response({'detail': 'New password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        lowercase_validator = LowercaseValidator()
+        try:
+            lowercase_validator.validate(new_password)
+        except ValidationError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        uppercase_validator = UppercaseValidator()
+        try:
+            uppercase_validator.validate(new_password)
+        except ValidationError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        symbol_validator = SymbolValidator()
+        try:
+            symbol_validator.validate(new_password)
+        except ValidationError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
+    
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})

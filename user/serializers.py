@@ -40,7 +40,7 @@ class SymbolValidator(object):
 
     def get_help_text(self):
         return "Your password must contain at least 1 special character: " \
-               "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"
+            "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"
 
 
 class RepeatedValidator(object):
@@ -70,6 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        read_only_fields = ['username', 'email', 'dob']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_password(self, value):
@@ -98,13 +99,14 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password')
+        password = validated_data.pop('password', None)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        if password:
+            instance.set_password(password)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.image = validated_data.get('image', instance.image)
-        instance.dob = validated_data.get('dob', instance.dob)
         instance.save()
         return instance
