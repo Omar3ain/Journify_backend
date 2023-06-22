@@ -11,9 +11,11 @@ from journify.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
-# for user in User.objects.all():
-#     Token.objects.get_or_create(user=user)
+for user in User.objects.all():
+    Token.objects.get_or_create(user=user)
 
 
 class ListUsersView(generics.ListAPIView):
@@ -54,9 +56,20 @@ class GetUserView(APIView):
     
 
 class CreateUserView(generics.CreateAPIView):
-    # permission_classes = [IsAdminUser | AllowAny]
     permission_classes = [IsAdminOrUnauthenticatedUser]
     serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        password = self.request.data.get('password')
+
+        # Validate the password
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            serializer.fail('password_validation', password_validators=e.error_list)
+
+        # Save the user
+        serializer.save(password=password, is_active=True)
 
 
 class DeleteUserView(generics.DestroyAPIView):
@@ -79,12 +92,12 @@ class LoginView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             try:
-                token = Token.objects.get_or_create(user=user)
+                token, created = Token.objects.get_or_create(user=user)
             except Token.DoesNotExist:
                 print('Token does not exist')
             return Response({'token': token.key})
         else:
-            return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
         
         
 
@@ -93,25 +106,19 @@ class CustomAuthToken(ObtainAuthToken):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        # Create a dictionary containing the user data
-        if user.image:
-            image_url = user.image.url  # or user.image.path, depending on your storage backend
-        else:
-            image_url = None
-                    
+        token, _ = Token.objects.get_or_create(user=user)
+
         user_data = {
             'id': user.id,
             'username': user.username,
             'email': user.email,
             'dob': user.dob,
             'phone': user.phone,
-            'image': image_url,
+            'image': user.image.url if user.image else None,
             'isAdmin': user.is_superuser,
         }
-        # Merge the user data with the token data
         response_data = {
-            'token': token.key, 
+            'token': token.key,
             **user_data
         }
         return Response(response_data)
