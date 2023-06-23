@@ -8,7 +8,6 @@ from django.core.validators import MinLengthValidator, MinValueValidator, MaxVal
 
 # Create your models here.
 
-
 class Flight(models.Model):
     company_name = models.CharField(
         'companyName', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
@@ -22,7 +21,7 @@ class Flight(models.Model):
         'availableSeats', blank=False, null=False, validators=[MinValueValidator(1), MaxValueValidator(400)])
 
     def __str__(self):
-        return f'{self.origin}:{self.destination}'
+        return f'{self.origin.name}:{self.destination.name}'
 
 
 class Flight_Reservation(models.Model):
@@ -34,4 +33,4 @@ class Flight_Reservation(models.Model):
         'seatsNumber', validators=[MinValueValidator(1), MaxValueValidator(15)])
 
     def __str__(self):
-        return f'{self.flight_id.origin}:{self.flight_id.destination}--{self.user_id}-- at {self.flight_id.traveling_date}'
+        return f'{self.flight_id.origin.name}:{self.flight_id.destination.name}--{self.user_id}-- at {self.flight_id.traveling_date}'
