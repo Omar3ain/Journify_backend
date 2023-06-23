@@ -22,11 +22,11 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('dob', '1997-5-5')
-        extra_fields.setdefault('zip_code', '15289')
-        extra_fields.setdefault('city', 'Cairo')
-        extra_fields.setdefault('country', 'EG')
-        extra_fields.setdefault('street_name', '14m')
+        # extra_fields.setdefault('dob', '1997-5-5')
+        # extra_fields.setdefault('zip_code', '15289')
+        # extra_fields.setdefault('city', 'Cairo')
+        # extra_fields.setdefault('country', 'EG')
+        # extra_fields.setdefault('street_name', '14m')
 
         return self.create_user(username, password, **extra_fields)
     
@@ -46,15 +46,15 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=255, validators=[MinLengthValidator(3)])
     phone_regex = RegexValidator(regex=r'^\d{1,20}$', message="Phone number should contain only digits.")
     username = models.CharField(max_length=255, null=False, blank=False ,unique=True)
-    email = models.EmailField(unique=True)
-    dob = models.DateField(null=False, blank=False)
+    email = models.EmailField(unique=True, null=False, blank=False)
+    dob = models.DateField(null=True, blank=True) #
     image = models.FileField(upload_to='user_images', null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_regex])
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=False, blank=False )
-    zip_code = models.CharField(max_length=20, null=False, blank=False)
-    city = models.CharField(max_length=30, null=False, blank=False)
-    country = CountryField(null=False, blank=False)
-    street_name = models.CharField(null=False, max_length=255)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True ) #
+    zip_code = models.CharField(max_length=20, null=True, blank=True) #
+    city = models.CharField(max_length=30, null=True, blank=True) #
+    country = CountryField(null=True, blank=True) #
+    street_name = models.CharField(null=True, max_length=255) #
     building_no =models.IntegerField(null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

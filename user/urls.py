@@ -12,4 +12,5 @@ urlpatterns = [
     path('<int:user_id>/change-password/', UserChangePassword.as_view(), name='user_change_password'),
     path('create/', CreateUserView.as_view(), name='create_user'),
     path('login/', LoginView.as_view(), name='login'),
+    path('accounts/', include('allauth.urls')),
 ]   
