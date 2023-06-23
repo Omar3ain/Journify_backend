@@ -8,8 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import Flight
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from journify.permission import IsOwnerOrReadOnly, IsAdminOrUnauthenticatedUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 
@@ -35,11 +34,17 @@ class GetFlightView(APIView):
     
 
 class FlightView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
     serializer_class = FlightSerializer
 
     def get_queryset(self):
         return Flight.objects.filter(traveling_date__gt=datetime.datetime.now(tz=pytz.utc))
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
     
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
