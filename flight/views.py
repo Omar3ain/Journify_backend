@@ -1,13 +1,14 @@
 import pytz
 import datetime
+from django.utils import timezone
 from rest_framework import generics
 from django.shortcuts import get_object_or_404, render
-from .serializers import FlightSerializer
+from .serializers import FlightSerializer, EditReservationsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import Flight
+from .models import Flight, Flight_Reservation
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
@@ -72,3 +73,62 @@ class FlightView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
             return Response({'detail': 'Flight deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
         except Flight.DoesNotExist:
             return Response({'detail': 'Flight not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ListFlight_ReservationsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EditReservationsSerializer
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        return Flight_Reservation.objects.filter(user_id=user_id)
+    
+    def list(self, request, *args, **kwargs):
+        data = self.get_queryset()
+        serializer = self.get_serializer(data, many=True)
+        return Response(serializer.data)
+
+
+class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EditReservationsSerializer
+
+    def get_queryset(self):
+        user_id = self.request.user.id
+        return Flight_Reservation.objects.filter(user_id=user_id)
+    
+    def post(self, request, pk, *args, **kwargs):
+        data = {"user_id": request.user.id, "flight": pk, "number_seats": request.data["number_seats"]}
+        print(data)
+        serializer = self.get_serializer(data= data, context={"user": request.user, "flight_id": pk})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def patch(self, request, pk, action, *args, **kwargs):
+        try:
+            print(pk)
+            instance = self.get_queryset().get(flight=pk)
+            print(instance)
+            serializer = self.get_serializer(
+                instance, data=request.data, context={"action": action, "flight_id": pk})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Flight_Reservation.DoesNotExist:
+            return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, pk, action=None, *args, **kwargs):
+        try:
+            instance = self.get_queryset().get(flight=pk)
+            flight = Flight.objects.get(id=pk)
+            if((flight.traveling_date - timezone.now()) <= datetime.timedelta(days=2) ):
+               return Response({"error": "Reservations can only be cancelled before 2 days"}, status=status.HTTP_406_NOT_ACCEPTABLE)   
+            else:
+                flight.available_seats += instance.number_seats
+                flight.save()
+                instance.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        except Flight_Reservation.DoesNotExist:
+            return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
