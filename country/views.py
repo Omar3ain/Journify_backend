@@ -1,32 +1,43 @@
-from django.shortcuts import render, redirect
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 from .models import Country
-# Create your views here.
+from .serializers import CountrySerializer
 
-def country_list(request):
-    countries = Country.objects.all()
-    return render(request, 'country_list.html', {'countries': countries})
+class CountryAPIView(APIView):
+    def get(self, request):
+        countries = Country.objects.all()
+        serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data)
 
-def country_create(request):
-    if request.method == 'POST':
-        name = request.POST['name']
-        code = request.POST['code']
-        country = Country(name=name, code=code)
-        country.save()
-        return redirect('country_list')
-    return render(request, 'country_create.html')
+    def post(self, request):
+        serializer = CountrySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def country_update(request, pk):
-    country = Country.objects.get(pk=pk)
-    if request.method == 'POST':
-        country.name = request.POST['name']
-        country.code = request.POST['code']
-        country.save()
-        return redirect('country_list')
-    return render(request, 'country_update.html', {'country': country})
+class CountryDetailAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Country.objects.get(pk=pk)
+        except Country.DoesNotExist:
+            raise status.HTTP_404_NOT_FOUND
 
-def country_delete(request, pk):
-    country = Country.objects.get(pk=pk)
-    if request.method == 'POST':
+    def get(self, request, pk):
+        country = self.get_object(pk)
+        serializer = CountrySerializer(country)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        country = self.get_object(pk)
+        serializer = CountrySerializer(country, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        country = self.get_object(pk)
         country.delete()
-        return redirect('country_list')
-    return render(request, 'country_delete.html', {'country': country})
+        return Response(status=status.HTTP_204_NO_CONTENT)
