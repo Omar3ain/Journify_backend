@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from .models import StayReservation
+from user.models import User
 
 
 
 class StayReservationSerializer(serializers.ModelSerializer):
+    user=User()
     class Meta:
         model = StayReservation
-        fields = '__all__'
+        exclude=['user','price']
 
 
 

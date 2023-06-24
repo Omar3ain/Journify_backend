@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'properties',
     'payment',
     'hotel',
+    'hotelReservation',
     'flight',
     'country',
     'city'
