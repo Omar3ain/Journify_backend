@@ -6,3 +6,5 @@ django-jet-reboot
 django-countries
 django-allauth
 FeedParser
+aiohttp
+channels
