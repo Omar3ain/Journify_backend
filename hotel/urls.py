@@ -4,7 +4,7 @@ from .views import (
     
 )
 
-app_name = 'reservations'
+app_name = 'hotels'
 urlpatterns = [
     path('', HotelListView.as_view(), name='list'),
 ]
