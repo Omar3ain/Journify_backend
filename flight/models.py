@@ -27,10 +27,10 @@ class Flight(models.Model):
 class Flight_Reservation(models.Model):
     user_id = models.ForeignKey(
         User, related_name="user", on_delete=models.DO_NOTHING)
-    flight_id = models.ForeignKey(
+    flight = models.ForeignKey(
         Flight, related_name="flight", on_delete=models.CASCADE)
     number_seats = models.PositiveIntegerField(
         'seatsNumber', validators=[MinValueValidator(1), MaxValueValidator(15)])
 
     def __str__(self):
-        return f'{self.flight_id.origin.name}:{self.flight_id.destination.name}--{self.user_id}-- at {self.flight_id.traveling_date}'
+        return f'{self.flight.origin.name}:{self.flight.destination.name}--{self.user_id}-- at {self.flight.traveling_date}'

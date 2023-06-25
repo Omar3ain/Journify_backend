@@ -1,5 +1,6 @@
 from django.urls import include, path
 from .views import CreateUserView, GetUserView, ListUsersView, DeleteUserView, UserProfileView, CustomAuthToken ,LoginView, UpdateUserView, UserChangePassword
+from flight.views import ListFlight_ReservationsView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -13,4 +14,6 @@ urlpatterns = [
     path('create/', CreateUserView.as_view(), name='create_user'),
     path('login/', LoginView.as_view(), name='login'),
     path('accounts/', include('allauth.urls')),
+    path('reservations/', ListFlight_ReservationsView.as_view(), name='list_flightReservations'),
+
 ]   
