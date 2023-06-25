@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import User
+from hotel.models import Hotel
 from rest_framework import serializers, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ class StayReservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # user_id = models.ForeignKey(
     #     User, related_name="user", on_delete=models.DO_NOTHING)
-    # hotelId = models.ForeignKey('Hotel', on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, default=None)
     numberOfRooms=models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     numberOfPeople = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     startDate = models.DateField(auto_now_add=True)

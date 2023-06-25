@@ -3,16 +3,18 @@ from  user.models import  User
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
+from country.models import Country
 
 # Create your models here.
 
 class Hotel(models.Model):
-    hotel_name = models.CharField(
+    name = models.CharField(
         'hotelName', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
-    hotel_desc = models.CharField(
+    description = models.CharField(
         'hotelDescription', blank=False, max_length=150, null=False, validators=[MinLengthValidator(3)])
     # origin = CountryField(null=False, blank=False)
-
+    countryId = models.ForeignKey(Country, on_delete=models.CASCADE)
+    image = models.CharField('hotelImage',  blank=False, max_length=150, null=False, validators=[MinLengthValidator(3)])
     room_price = models.PositiveIntegerField('roomPrice', blank=False, null=False, validators=[
                                                MinValueValidator(15), MaxValueValidator(7000)])
     available_rooms = models.IntegerField(
@@ -21,4 +23,4 @@ class Hotel(models.Model):
     latitude = models.CharField('longitude', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
 
     def __str__(self):
-        return f'{self.hotel_name}:{self.hotel_desc}'
+        return f'{self.name}:{self.description}'
