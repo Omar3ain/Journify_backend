@@ -5,7 +5,7 @@ from .views import (
     
 )
 
-app_name = 'hotels'
+app_name = 'reservations'
 urlpatterns = [
     path('', ReservationList.as_view(), name='list'),
     path('create/', CreateReservation.as_view(), name='create'),
