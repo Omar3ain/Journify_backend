@@ -20,7 +20,7 @@ class Hotel(models.Model):
     available_rooms = models.IntegerField(
         'availableRooms', blank=False, null=False, validators=[MinValueValidator(0), MaxValueValidator(70)])
     longitude = models.CharField('longitude', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
-    latitude = models.CharField('longitude', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
+    latitude = models.CharField('latitude', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
 
     def __str__(self):
         return f'{self.name}:{self.description}'
