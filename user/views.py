@@ -49,7 +49,6 @@ class GetUserView(APIView):
     def get(self, request, user_id):
         try:
             user = User.objects.get(pk=user_id)
-            print(user)
         except User.DoesNotExist:
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -63,7 +62,9 @@ class CreateUserView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         password = self.request.data.get('password')
-
+        email = self.request.data.get('email')
+        username = self.request.data.get('username')
+        dob = self.request.data.get('dob')
         # Validate the password
         try:
             validate_password(password)
@@ -71,7 +72,7 @@ class CreateUserView(generics.CreateAPIView):
             serializer.fail('password_validation', password_validators=e.error_list)
 
         # Save the user
-        serializer.save(password=password, is_active=True)
+        serializer.save(password=password , username=username, email=email, dob=dob,is_active=True )
 
 
 class DeleteUserView(generics.DestroyAPIView):
@@ -111,10 +112,12 @@ class LoginView(APIView):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             try:
+                loggedUser = get_object_or_404(User, username=username)
+                serializer = UserSerializer(loggedUser)
                 token, created = Token.objects.get_or_create(user=user)
             except Token.DoesNotExist:
                 print('Token does not exist')
-            return Response({'token': token.key})
+            return Response({'token': token.key , 'user': serializer.data })
         else:
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
         

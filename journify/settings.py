@@ -79,7 +79,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'journify.urls'
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:5173',  # Replace with your frontend domain and port
+    'http://localhost:19006',  # Replace with your frontend domain and port
 ]
 # ALLOWED_HOSTS = []
 
@@ -161,8 +161,10 @@ USE_TZ = True
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

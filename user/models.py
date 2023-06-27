@@ -48,7 +48,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=255, null=False, blank=False ,unique=True)
     email = models.EmailField(unique=True, null=False, blank=False)
     dob = models.DateField(null=True, blank=True) #
-    image = models.FileField(upload_to='user_images', null=True, blank=True)
+    image = models.FileField(upload_to='static/user_images', null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_regex])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True ) #
     zip_code = models.CharField(max_length=20, null=True, blank=True) #
