@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'user',
     'recommendation',
+    'journey_plans',
     'properties',
     'payment',
     'hotel',

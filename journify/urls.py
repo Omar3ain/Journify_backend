@@ -30,6 +30,7 @@ urlpatterns = [
     path('payment/', include('payment.urls')),
     path('properties/', include('properties.urls')),
     path('recommendation/', include('recommendation.urls')),
+    path('jplans/', include('journey_plans.urls')),
     path('jet/', include('jet.urls', 'jet')),
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
 ]
