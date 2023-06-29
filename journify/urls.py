@@ -26,6 +26,7 @@ urlpatterns = [
     path('country/', include('country.urls')),
     path('flight/', include('flight.urls')),
     path('hotel/', include('hotel.urls')),
+    path("hotel-review/", include("hotelReview.urls")),
     path('stayreservation/', include('hotelReservation.urls')),
     path('payment/', include('payment.urls')),
     path('properties/', include('properties.urls')),
