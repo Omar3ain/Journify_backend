@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'hotelReservation',
     'flight',
     'country',
-    'city'
+    'city',
+    'hotelReview'
 ]
 
 SITE_ID = 1
