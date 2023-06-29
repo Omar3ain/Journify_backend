@@ -14,6 +14,8 @@ class Hotel(models.Model):
         'hotelDescription', blank=False, max_length=150, null=False, validators=[MinLengthValidator(3)])
     # origin = CountryField(null=False, blank=False)
     countryId = models.ForeignKey(Country, on_delete=models.CASCADE)
+    city = models.CharField(
+        'city', blank=False, max_length=15, null=False, validators=[MinLengthValidator(3)])
     image = models.CharField('hotelImage',  blank=False, max_length=150, null=False, validators=[MinLengthValidator(3)])
     room_price = models.PositiveIntegerField('roomPrice', blank=False, null=False, validators=[
                                                MinValueValidator(15), MaxValueValidator(7000)])
