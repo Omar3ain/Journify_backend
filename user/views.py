@@ -188,3 +188,22 @@ class CustomAuthToken(ObtainAuthToken):
             **user_data
         }
         return Response(response_data)
+    
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        # Access token authentication succeeded
+        user = request.user
+        # Process the authenticated user as needed
+        print(user.country)
+        if user is not None:
+            try:
+                loggedUser = get_object_or_404(User, username=user.username)
+                serializer = UserSerializer(loggedUser)
+                token, created = Token.objects.get_or_create(user=user)
+            except Token.DoesNotExist:
+                print('Token does not exist')
+            return Response({'token': token.key , 'user': serializer.data })
+        else:
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_404_NOT_FOUND)

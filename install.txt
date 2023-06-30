@@ -4,6 +4,7 @@ django-cors-headers
 django-jet-reboot 
 django-countries
 django-allauth
+drf_social_oauth2
 FeedParser
 aiohttp
 channels

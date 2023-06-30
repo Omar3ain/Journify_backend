@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django_countries.serializers import CountryFieldMixin
 from .models import User
 import re
 
@@ -64,13 +65,13 @@ class RepeatedValidator(object):
         return "Your password cannot be the same as previously used passwords."
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(CountryFieldMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, min_length=8)
 
     class Meta:
         model = User
         fields = '__all__'
-        read_only_fields = ['username', 'email', 'dob']
+        read_only_fields = ['username', 'email', 'dob', 'country']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_password(self, value):
