@@ -16,7 +16,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class HotelCheckout(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk):
+    def post(self, request, pk):
         user = request.user
         hotelDetails = Payment.get_stay_by_id(self, pk)
         if type(hotelDetails) is Response:
@@ -54,7 +54,7 @@ class HotelCheckout(APIView):
 class FlightCheckout(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk):
+    def post(self, request, pk):
         user = request.user
         flightDetails = Payment.get_flight_by_id(self, pk)
         if type(flightDetails) is Response:

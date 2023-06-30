@@ -9,3 +9,6 @@ FeedParser
 aiohttp
 channels
 stripe
+oauth2_provider
+python-social-auth[django]
+drf-social-oauth2
