@@ -13,16 +13,21 @@ class Payment(models.Model):
     stayResId = models.ForeignKey(
         StayReservation, on_delete=models.CASCADE, null=True, blank=True)
     status = models.BooleanField(default=False)
-    
+
     def get_stay_by_id(self, pk):
         try:
             return StayReservation.objects.get(pk=pk)
         except StayReservation.DoesNotExist:
             return Response({'error': 'No hotel reservation found'}, status=status.HTTP_404_NOT_FOUND)
-        
 
-    # one of the two foriegn keys should be null and the other should be not null
+    def get_flight_by_id(self, pk):
+        try:
+            return Flight_Reservation.objects.get(pk=pk)
+        except Flight_Reservation.DoesNotExist:
+            return Response({'error': 'No flight reservation found'}, status=status.HTTP_404_NOT_FOUND)
+
     def clean(self):
+        # one of the two foriegn keys should be null and the other should be not null
         if self.flightResId is None and self.stayResId is None:
             raise ValidationError(
                 'Both flightResId and stayResId cannot be null')
@@ -30,11 +35,11 @@ class Payment(models.Model):
             raise ValidationError(
                 'Both flightResId and stayResId cannot be not null')
 
-    # override model's save method to make it always call the clean() method before triggering the Model class save method
     def save(self, *args, **kwargs):
+        # override model's save method to make it always call the clean() method before triggering the Model class save method
         self.full_clean()
         return super(Payment, self).save(*args, **kwargs)
 
     def __str__(self):
         # get the user's email from the flight reservation or the hotel reservation
-        return f'{self.flightResId.user.email if self.flightResId is not None else self.stayResId.user.email} - {self.payment_id}'
+        return f'{self.flightResId.user_id.email if self.flightResId is not None else self.stayResId.user.email} - {self.payment_id}'
