@@ -7,3 +7,4 @@ django-allauth
 FeedParser
 aiohttp
 channels
+stripe
