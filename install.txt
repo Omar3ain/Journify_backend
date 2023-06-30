@@ -8,3 +8,4 @@ drf_social_oauth2
 FeedParser
 aiohttp
 channels
+stripe
