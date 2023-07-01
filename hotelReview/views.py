@@ -7,7 +7,7 @@ from rest_framework import status
 from django.db import IntegrityError
 
 class HotelReviewCreateView(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = HotelReviewSerializer
 
     def create(self, request, *args, **kwargs):

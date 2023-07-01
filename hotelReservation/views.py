@@ -16,7 +16,7 @@ from rest_framework import status
 
 
 class ReservationList(generics.ListAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     # queryset = StayReservation.objects.all()
     serializer_class = StayReservationSerializer
     def get_queryset(self):
@@ -30,7 +30,7 @@ class ReservationList(generics.ListAPIView):
 
 
 class CreateReservation(generics.ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = StayReservationSerializer
 
     def get_queryset(self):
