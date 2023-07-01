@@ -16,7 +16,7 @@ from rest_framework import status
 
 
 class ReservationList(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     # queryset = StayReservation.objects.all()
     serializer_class = StayReservationSerializer
     def get_queryset(self):
@@ -28,52 +28,9 @@ class ReservationList(generics.ListAPIView):
         
         
 
-# class CreateReservation(generics.ListCreateAPIView):
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = StayReservationSerializer
-#     def get_queryset(self):
-#         return StayReservation.objects.all()
-        
-#     def post(self, request):
-#         if not self.request.user.is_authenticated:
-#             return Response({'error':'user Is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
-#         number_of_days = request.data.get('numberOfDays')
-#         number_of_rooms = request.data.get('numberOfRooms')
-#         number_of_people = request.data.get('numberOfPeople')
-#         room_type = request.data.get('room_type')
-#         hotel_id = request.data.get('hotel')
-#         hotel = Hotel.objects.get(id=hotel_id)
-#         hotel.available_rooms-= int(number_of_rooms)
-#         print(request.data)
-#         if hotel.available_rooms < 1:
-#             return Response({'error': 'no available rooms'}, status=status.HTTP_400_BAD_REQUEST)
-#         hotel.save()
-
-#         if not number_of_days or not number_of_rooms:
-#             return Response({'error': 'numberOfDays and numberOfRooms are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         all_price = StayReservation.get_price(self)
-#         # all_price = self.get_price()
-#         user = self.request.user  # Get the authenticated user
-#         reservation = StayReservation(user=user, room_type=room_type, hotel=hotel, numberOfRooms=number_of_rooms, price=all_price, numberOfDays=number_of_days, numberOfPeople=number_of_people)
-#         reservation.save()
-#         serializer = StayReservationSerializer(reservation)
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-
-#     def get_price(self):
-#         # all_price= self.price=(self.numberOfDays * self.numberOfRooms)
-        
-#         if self.room_type == 'S':
-#             return self.numberOfDays * self.numberOfRooms
-#         elif self.room_type == 'D':
-#             return self.numberOfDays * self.numberOfRooms * 2
-#         else:
-#             return 0
-    
 
 class CreateReservation(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = StayReservationSerializer
 
     def get_queryset(self):
