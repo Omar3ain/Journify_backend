@@ -4,7 +4,7 @@ from .models import HotelReview
 class HotelReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = HotelReview
-        fields = ['user', 'hotel', 'title', 'comment', 'rating']
+        fields = '__all__'
         
     def create(self, validated_data):
       validated_data['user'] = self.context['request'].user

@@ -1,10 +1,20 @@
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import HotelReview
 from .serializers import HotelReviewSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import IntegrityError
+
+
+class HotelReviewGetView(APIView):
+    def get(self, request, hotel_id):
+        hotelsReviews =HotelReview.objects.filter(hotel=hotel_id)
+        serializer = HotelReviewSerializer(hotelsReviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+   
+
 
 class HotelReviewCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
