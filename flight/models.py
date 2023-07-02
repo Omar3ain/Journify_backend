@@ -1,12 +1,13 @@
 import pytz
 import datetime
 from django.db import models
-from  user.models import  User
+from user.models import User
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 
 # Create your models here.
+
 
 class Flight(models.Model):
     company_name = models.CharField(
@@ -31,6 +32,9 @@ class Flight_Reservation(models.Model):
         Flight, related_name="flight", on_delete=models.CASCADE)
     number_seats = models.PositiveIntegerField(
         'seatsNumber', validators=[MinValueValidator(1), MaxValueValidator(15)])
+    flightClass = models.CharField(max_length=8, choices=[
+        ('Economy', 'Economy'),
+        ('Business', 'Business')], default="Economy")
 
     def __str__(self):
         return f'{self.flight.origin.name}:{self.flight.destination.name}--{self.user_id}-- at {self.flight.traveling_date}'

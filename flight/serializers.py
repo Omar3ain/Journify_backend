@@ -71,7 +71,7 @@ class EditReservationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight_Reservation
-        fields = ["id", "number_seats", "flight", "total_price"]
+        fields = ["id", "number_seats", "flight", "total_price", "flightClass"]
 
     def get_total_price(self, obj):
         return obj.flight.ticket_price * obj.number_seats
@@ -88,7 +88,7 @@ class EditReservationsSerializer(serializers.ModelSerializer):
             try:
                 flight = Flight.objects.get(id=flight_id)
                 reserved_flight = Flight_Reservation.objects.create(
-                    user_id=user, flight=flight, number_seats=validated_data['number_seats'])
+                    user_id=user, flight=flight, number_seats=validated_data['number_seats'], flightClass=validated_data['flightClass'])
                 edit_flight_availableSeats(
                     flight, validated_data['number_seats'])
                 reserved_flight.save()
@@ -100,43 +100,54 @@ class EditReservationsSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         seats = validated_data['number_seats']
+        flightClass = validated_data['flightClass']
         action = self.context.get('action')
         flight_id = self.context['flight_id']
+        user = self.context['user']
 
         try:
             flight = Flight.objects.get(id=flight_id)
-            if action not in ('add', 'remove', 'edit'):
-                raise serializers.ValidationError(
-                    {'error': "Action can only be 'add' or 'remove' or 'edit"}, code=400)
-
-            if action == 'add':
-                instance.number_seats += seats
-                # if (instance.number_seats > 15):
-                    # raise serializers.ValidationError(
-                        # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
-                edit_flight_availableSeats(flight, seats)
-
-            elif action == 'remove' and instance.number_seats > 0:
-                instance.number_seats -= seats
-                flight.available_seats += seats
-                flight.save()
-
-            elif action == 'edit':
-                # if (seats > 15):
-                    # raise serializers.ValidationError(
-                        # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
-                flight.available_seats += instance.number_seats
-                edit_flight_availableSeats(flight, seats)
-                instance.number_seats = seats
-
-            if (instance.number_seats == 0):
-                if ((flight.traveling_date - timezone.now()) <= datetime.timedelta(days=2)):
+            if (instance):
+                if action not in ('add', 'remove', 'edit'):
                     raise serializers.ValidationError(
-                        {'error': "Reservations can only be cancelled before 2 days"}, code=400)
-                else:
-                    instance.delete()
-                    return instance
+                        {'error': "Action can only be 'add' or 'remove' or 'edit"}, code=400)
 
+                if action == 'add':
+                    instance.number_seats += seats
+                    # if (instance.number_seats > 15):
+                    # raise serializers.ValidationError(
+                    # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
+                    edit_flight_availableSeats(flight, seats)
+
+                elif action == 'remove' and instance.number_seats > 0:
+                    instance.number_seats -= seats
+                    flight.available_seats += seats
+                    flight.save()
+
+                elif action == 'edit':
+                    # if (seats > 15):
+                    # raise serializers.ValidationError(
+                    # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
+                    flight.available_seats += instance.number_seats
+                    edit_flight_availableSeats(flight, seats)
+                    instance.number_seats = seats
+
+                if (instance.number_seats == 0):
+                    if ((flight.traveling_date - timezone.now()) <= datetime.timedelta(days=2)):
+                        raise serializers.ValidationError(
+                            {'error': "Reservations can only be cancelled before 2 days"}, code=400)
+                    else:
+                        instance.delete()
+                        return instance
+            else:
+                instance = Flight_Reservation.objects.create(
+                    user_id=user, flight=flight, number_seats=validated_data['number_seats'])
+                edit_flight_availableSeats(
+                    flight, validated_data['number_seats'])
+                
+            if(flightClass):
+                instance.flightClass = flightClass
+                
             instance.save()
             return instance
 
