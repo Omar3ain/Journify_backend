@@ -24,7 +24,7 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('city/', include('city.urls')),
     path('country/', include('country.urls')),
-    path('flight/', include('flight.urls')),
+    path('flights/', include('flight.urls')),
     path('hotel/', include('hotel.urls')),
     path("hotel-review/", include("hotelReview.urls")),
     path('stayreservation/', include('hotelReservation.urls')),
