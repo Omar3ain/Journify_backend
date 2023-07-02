@@ -21,6 +21,7 @@ class CountryAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class CountryDetailAPIView(APIView):
     def get_object(self, pk):
         try:
@@ -50,7 +51,7 @@ class CountryDetailAPIView(APIView):
 # get coordinates of a city or country using django-countries and geopy
 class GeoLocationAPI(APIView):
     def get(self, request):
-        country_name = "paris"
+        country_name = request.GET.get('name')
 
         # Retrieve the country object using the django-countries package
         country = CountryField(name=country_name)
@@ -71,4 +72,4 @@ class GeoLocationAPI(APIView):
                 'longitude': longitude
             })
 
-        return  JsonResponse({'geolocation': geolocation})
+        return Response({'geolocation': geolocation})
