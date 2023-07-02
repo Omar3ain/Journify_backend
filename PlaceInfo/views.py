@@ -50,7 +50,5 @@ def get_popular_places(request):
     if name:
         params['name'] = name
 
-    print(params)
-
-    # details_data = asyncio.run(get_data_async(params))
-    return JsonResponse('details_data', safe=False)
+    details_data = asyncio.run(get_data_async(params))
+    return JsonResponse(details_data, safe=False)
