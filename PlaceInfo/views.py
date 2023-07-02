@@ -1,10 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 import requests
-import asyncio
-import aiohttp
 from django.http import JsonResponse
-from recommendation.views import get_data_async
 from country.views import get_geolocation
 import json
 
@@ -25,6 +22,7 @@ class PlaceInfo(View):
             return JsonResponse({'error': str(e)})
 
 
+# same used for search and popular places
 def get_popular_places(request):
     city_name = request.GET.get('city_name')
     radius = request.GET.get('radius', '5000')
@@ -38,17 +36,22 @@ def get_popular_places(request):
     lat = data['latitude']
     lon = data['longitude']
 
+    # make condition on route name
+    rate = ''
+    if request.path == '/place/popular/':
+        rate = '3'
+
     params = {
         'lat': lat or "48.8534951",
         'lon': lon or "2.3483915",
         'radius': radius or '5000',
         'limit': '35',
-        'kinds': kinds or 'cultural,historic,interesting_places',
-        'rate': '3',
+        'kinds': kinds or '',
+        'rate': rate,
     }
 
     if name:
         params['name'] = name
 
-    details_data = asyncio.run(get_data_async(params))
-    return JsonResponse(details_data, safe=False)
+    # details_data = asyncio.run(get_data_async(params))
+    return JsonResponse('details_data', safe=False)
