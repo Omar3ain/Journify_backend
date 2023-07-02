@@ -21,8 +21,7 @@ class ListFlightsView(generics.ListAPIView):
     def get_queryset(self):
         requested_origin = self.request.query_params['from']
         requested_destination = self.request.query_params['to']
-        print("flight", Flight.objects.filter(origin__exact=requested_origin))
-        return Flight.objects.filter(origin__exact=requested_origin, destination__exact=requested_destination, traveling_date__gt=datetime.datetime.now(tz=pytz.utc))
+        return Flight.objects.filter(origin__exact=requested_origin, destination__exact=requested_destination, traveling_date__gt=datetime.datetime.now(tz=pytz.utc), available_seats__gt=0)
 
 
 class GetFlightView(APIView):
@@ -103,7 +102,7 @@ class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestr
 
     def post(self, request, pk, *args, **kwargs):
         data = {"user_id": request.user.id, "flight": pk,
-                "number_seats": request.data["number_seats"], "flightClass":request.data["flightClass"]}
+                "number_seats": request.data["number_seats"], "flightClass": request.data["flightClass"]}
         serializer = self.get_serializer(
             data=data, context={"user": request.user, "flight_id": pk})
         serializer.is_valid(raise_exception=True)
