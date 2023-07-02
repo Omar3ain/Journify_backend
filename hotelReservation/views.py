@@ -39,7 +39,6 @@ class CreateReservation(generics.ListCreateAPIView):
     def post(self, request):
         if not self.request.user.is_authenticated:
             return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
         number_of_days = request.data.get('numberOfDays')
         number_of_rooms = request.data.get('numberOfRooms')
         number_of_people = request.data.get('numberOfPeople')
