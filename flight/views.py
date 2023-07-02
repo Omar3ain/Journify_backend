@@ -1,4 +1,5 @@
 import pytz
+import stripe
 import datetime
 from django.utils import timezone
 from rest_framework import generics
@@ -12,6 +13,16 @@ from .models import Flight, Flight_Reservation
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_API_KEY
+
+def get_payment_secret(price, user):
+    intent = stripe.PaymentIntent.create(
+        amount=price,
+        currency="egp",
+        metadata={'userid': user.id})
+    return intent.client_secret
 
 
 class ListFlightsView(generics.ListAPIView):
@@ -107,7 +118,8 @@ class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestr
             data=data, context={"user": request.user, "flight_id": pk})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        price = serializer.data.get("total_price")
+        return Response({**serializer.data, "client_secret": get_payment_secret(price, request.user)}, status=status.HTTP_201_CREATED)
 
     def patch(self, request, pk, action, *args, **kwargs):
         try:

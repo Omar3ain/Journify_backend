@@ -35,6 +35,22 @@ class Flight_Reservation(models.Model):
     flightClass = models.CharField(max_length=8, choices=[
         ('Economy', 'Economy'),
         ('Business', 'Business')], default="Economy")
+    
+    status = models.CharField(max_length=100, choices=[
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ], default='pending')
+    payment_intent_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f'{self.flight.origin.name}:{self.flight.destination.name}--{self.user_id}-- at {self.flight.traveling_date}'
+    
+    def confirm(self, payment_intent_id):
+        self.status = 'confirmed'
+        self.payment_intent_id = payment_intent_id
+        self.save()
+
+    def cancel(self):
+        self.status = 'cancelled'
+        self.save()
