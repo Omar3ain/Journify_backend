@@ -49,27 +49,27 @@ class CountryDetailAPIView(APIView):
 
 
 # get coordinates of a city or country using django-countries and geopy
-class GeoLocationAPI(APIView):
-    def get(self, request):
-        country_name = request.GET.get('name')
+def get_geolocation(request, *args, **kwargs):
 
-        # Retrieve the country object using the django-countries package
-        country = CountryField(name=country_name)
+    if request.method == 'GET':
+        city_name = request.GET.get('city_name') or 'Paris'
 
-        # Use a geocoder (e.g., Nominatim) to fetch city coordinates
-        geolocator = Nominatim(user_agent="journify")
-        location = geolocator.geocode(country.name)
+    country = CountryField(name=city_name)
 
-        # Check if location exists and retrieve the latitude and longitude
-        geolocation = []
-        if location:
-            latitude = location.latitude
-            longitude = location.longitude
+    # Use a geocoder (e.g., Nominatim) to fetch city coordinates
+    geolocator = Nominatim(user_agent="journify")
+    location = geolocator.geocode(country.name)
 
-            geolocation.append({
-                'name': location.address,
-                'latitude': latitude,
-                'longitude': longitude
-            })
+    # Check if location exists and retrieve the latitude and longitude
+    geolocation = []
+    if location:
+        latitude = location.latitude
+        longitude = location.longitude
 
-        return Response({'geolocation': geolocation})
+        geolocation.append({
+            'name': location.address,
+            'latitude': latitude,
+            'longitude': longitude
+        })
+
+    return JsonResponse({'latitude': latitude, 'longitude': longitude})
