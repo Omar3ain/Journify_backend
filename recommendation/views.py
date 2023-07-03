@@ -36,16 +36,16 @@ def get_data(request):
     name = request.GET.get('name')
     kinds = request.GET.get('kinds')
     userId = request.headers.get('userId')
-    stays = StayReservation.objects.filter(user_id=userId)
+    # stays = StayReservation.objects.filter(user_id=userId)
     
-    if not stays:
-        return JsonResponse({'error': 'No stay reservations found for the user.'})
+    # if not stays:
+    #     return JsonResponse({'error': 'No stay reservations found for the user.'})
     
-    last_stay = stays.last()
+    # last_stay = stays.last()
     
     params = {
-        'lat': last_stay.hotel.latitude,
-        'lon': last_stay.hotel.longitude,
+        'lat': '48.8534951',
+        'lon': '2.3483915',
         'radius': radius or '5000',
         'limit': '35',
         'kinds': kinds or 'cultural,historic',
