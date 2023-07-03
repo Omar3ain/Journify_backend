@@ -22,7 +22,7 @@ def get_payment_secret(price, user):
         amount=price,
         currency="egp",
         metadata={'userid': user.id})
-    return intent.client_secret
+    return intent
 
 
 class ListFlightsView(generics.ListAPIView):
