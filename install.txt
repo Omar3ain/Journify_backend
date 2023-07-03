@@ -13,3 +13,9 @@ oauth2_provider
 python-social-auth[django]
 geopy
 python-dotenv
+psycopg2
+asgiref
+dj-database-url
+django-database-url
+gunicorn
+sqlparse

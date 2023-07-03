@@ -6,13 +6,16 @@ from country.views import get_geolocation
 import asyncio
 from recommendation.views import get_data_async
 import json
+import os
 
+from dotenv import load_dotenv
+load_dotenv()
 
 class PlaceInfo(View):
     def get(self, request, xid):
         url = f'https://opentripmap-places-v1.p.rapidapi.com/en/places/xid/{xid}'
         headers = {
-            'X-RapidAPI-Key': '4532d6561cmsh43c9fefc912e7aap1934b0jsn4dbb3e87b432',
+            'X-RapidAPI-Key': '6422cf7990mshbd44509c20bab3bp18f2f3jsn21c40b0be65c',
             'X-RapidAPI-Host': 'opentripmap-places-v1.p.rapidapi.com'
         }
 

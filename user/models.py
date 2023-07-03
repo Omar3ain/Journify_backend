@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        # extra_fields.setdefault('dob', '1997-5-5')
+        extra_fields.setdefault('dob', '1997-5-5')
         # extra_fields.setdefault('zip_code', '15289')
         # extra_fields.setdefault('city', 'Cairo')
         # extra_fields.setdefault('country', 'EG')
@@ -47,7 +47,7 @@ class User(AbstractBaseUser):
     phone_regex = RegexValidator(regex=r'^\d{1,20}$', message="Phone number should contain only digits.")
     username = models.CharField(max_length=255, null=False, blank=False ,unique=True)
     email = models.EmailField(unique=True, null=False, blank=False)
-    dob = models.DateField(null=True, blank=True) #
+    dob = models.DateField(null=True, blank=True, default='1990-12-12') #
     image = models.FileField(upload_to='static/user_images', null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_regex])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True ) #

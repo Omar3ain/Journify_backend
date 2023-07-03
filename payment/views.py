@@ -15,7 +15,6 @@ from django.http import JsonResponse
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-
 stripe.api_key = 'sk_test_51NPUYhA5woj6pmWHKnBPkOJJWYMt6mA9Kj66uLdeAxdrZEXoy1dOBZe0zGErSHwyGxfEsG1uyZH8fICTIt6KqXah007YjZmOkx'
 
 @csrf_exempt

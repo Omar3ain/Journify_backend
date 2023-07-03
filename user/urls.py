@@ -18,3 +18,6 @@ urlpatterns = [
     path('reservations/', ListFlight_ReservationsView.as_view(), name='list_flightReservations'),
 
 ]   
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

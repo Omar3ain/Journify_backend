@@ -2,6 +2,10 @@ import requests
 from django.http import JsonResponse
 from hotelReservation.models import StayReservation
 from country.models import Country
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_trip_plans(request):
     url = 'https://ai-trip-planner.p.rapidapi.com/'

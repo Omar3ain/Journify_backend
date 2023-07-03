@@ -11,7 +11,7 @@ async def fetch_details(session, xid, headers):
 async def get_data_async(params):
     url = 'https://opentripmap-places-v1.p.rapidapi.com/en/places/radius'
     headers = {
-        'X-RapidAPI-Key': '4532d6561cmsh43c9fefc912e7aap1934b0jsn4dbb3e87b432',
+        'X-RapidAPI-Key': '6422cf7990mshbd44509c20bab3bp18f2f3jsn21c40b0be65c',
         'X-RapidAPI-Host': 'opentripmap-places-v1.p.rapidapi.com'
     }
 
@@ -36,16 +36,16 @@ def get_data(request):
     name = request.GET.get('name')
     kinds = request.GET.get('kinds')
     userId = request.headers.get('userId')
-    # stays = StayReservation.objects.filter(user_id=userId)
+    stays = StayReservation.objects.filter(user_id=userId)
     
-    # if not stays:
-    #     return JsonResponse({'error': 'No stay reservations found for the user.'})
+    if not stays:
+        return JsonResponse({'error': 'No stay reservations found for the user.'})
     
-    # last_stay = stays.last()
+    last_stay = stays.last()
     
     params = {
-        'lat': '48.8534951',
-        'lon': '2.3483915',
+        'lat': last_stay.hotel.latitude,
+        'lon': last_stay.hotel.longitude,
         'radius': radius or '5000',
         'limit': '35',
         'kinds': kinds or 'cultural,historic',
