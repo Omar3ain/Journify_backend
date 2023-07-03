@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny, I
 from hotel.models import Hotel
 from rest_framework.response import Response
 from rest_framework import status
+from datetime import datetime
 
 
 
@@ -44,6 +45,7 @@ class CreateReservation(generics.ListCreateAPIView):
         number_of_people = request.data.get('numberOfPeople')
         room_type = request.data.get('room_type')
         hotel_id = request.data.get('hotel')
+        start_date = request.data.get('startDate')
         hotel = Hotel.objects.get(id=hotel_id)
 
         hotel.available_rooms -= int(number_of_rooms)
@@ -52,7 +54,9 @@ class CreateReservation(generics.ListCreateAPIView):
         hotel.save()
 
         if not number_of_days or not number_of_rooms or not room_type:
-            return Response({'error': 'numberOfDays, numberOfRooms, and room_type are required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'numberOfDays, numberOfRooms, StartDate and room_type are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
 
         all_price = self.get_price(room_type,number_of_days, number_of_rooms, hotel.room_price)
         user = self.request.user  # Get the authenticated user
@@ -63,7 +67,8 @@ class CreateReservation(generics.ListCreateAPIView):
             numberOfRooms=number_of_rooms,
             price=all_price,
             numberOfDays=number_of_days,
-            numberOfPeople=number_of_people
+            numberOfPeople=number_of_people,
+             startDate=start_date
         )
         reservation.save()
         serializer = StayReservationSerializer(reservation)
