@@ -33,7 +33,7 @@ STRIPE_API_KEY = os.environ.get('SECRET_KEYSTRIPE_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -110,7 +110,9 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'journify-backend.onrender.com'
+]
 
 TEMPLATES = [
     {
