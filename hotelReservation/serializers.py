@@ -32,10 +32,10 @@ class StayReservationSerializer(serializers.ModelSerializer):
                     hotel.available_rooms += instance.numberOfRooms
                     instance.delete()
                     return instance
-                if (status == "confirmed" and payment_intent_id == None):
-                    instance.delete()
-                    raise serializers.ValidationError(
-                        {'error': ["Something went wrong in payment tyr again later"]}, 400)
+                # if (status == "confirmed" and (payment_intent_id == "")):
+                #     instance.delete()
+                #     raise serializers.ValidationError(
+                #         {'error': ["Something went wrong in payment tyr again later"]}, 400)
 
                 if (status == "pending"):
                     raise serializers.ValidationError(
