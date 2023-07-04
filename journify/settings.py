@@ -93,9 +93,11 @@ ROOT_URLCONF = 'journify.urls'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:19006',  # Replace with your frontend domain and port
+    'http://localhost:19009',  # Replace with your frontend domain and port
 ]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:19006',
+    'http://localhost:19009',
 ]
 
 CORS_ALLOW_HEADERS = [
