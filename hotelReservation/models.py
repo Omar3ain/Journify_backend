@@ -24,7 +24,13 @@ class StayReservation(models.Model):
     startDate = models.DateField(auto_now_add=True)
     numberOfDays = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     price = models.DecimalField(max_digits=7, decimal_places=2, default=20)
-    room_type = models.CharField(max_length=1, choices=room_choice, null=True, blank=True ) #
+    room_type = models.CharField(max_length=1, choices=room_choice, null=True, blank=True ) 
+    status = models.CharField(max_length=100, choices=[
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ], default='pending')
+
 
 
     
@@ -42,4 +48,3 @@ class StayReservation(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.user.email}'
-

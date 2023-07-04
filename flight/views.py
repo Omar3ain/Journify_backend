@@ -103,7 +103,7 @@ class ListFlight_ReservationsView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
+class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView, generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = EditReservationsSerializer
 
@@ -121,17 +121,21 @@ class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestr
         price = serializer.data.get("total_price")
         return Response({**serializer.data, "client_secret": get_payment_secret(price, request.user)}, status=status.HTTP_201_CREATED)
 
-    def patch(self, request, pk, action, *args, **kwargs):
-        try:
-            instance = self.get_queryset().filter(flight=pk).first()
-            serializer = self.get_serializer(
-                instance, data=request.data, context={"action": action, "flight_id": pk, "user": request.user})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+    def patch(self, request, pk, *args, **kwargs):
+            try:
+                instance = self.get_queryset().filter(flight=pk).first()
+                if instance:
+                    serializer = self.get_serializer(
+                        instance, data=request.data, context={ "flight_id": pk, "user": request.user}, partial=True)
+                else:
+                    return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+                
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Flight_Reservation.DoesNotExist:
-            return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+            except Flight_Reservation.DoesNotExist:
+                return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk, action=None, *args, **kwargs):
         try:
