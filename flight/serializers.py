@@ -9,8 +9,6 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 
-stripe.api_key = "sk_test_51NPVMMG8QYLQRO7Qd5iNUQuGPEVP2FizkQsgkCHgPpkkwh0TMe3UuvUnOFesiUaICB4HNQCKXj8lC7b94cGfliL300zU4d10fH"
-
 
 def edit_flight_availableSeats(flight: Flight, seats: int):
     if (flight.available_seats - seats < 0):
@@ -75,10 +73,11 @@ class EditReservationsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight_Reservation
-        fields = ["id", "number_seats", "flight", "total_price", "flightClass"]
+        fields = ["id", "number_seats", "flight",
+                  "total_price", "flightClass", "status", "expiration_time"]
 
     def get_total_price(self, obj):
-        return obj.flight.ticket_price * obj.number_seats* (2 if obj.flightClass == "Business" else 1)
+        return obj.flight.ticket_price * obj.number_seats * (2 if obj.flightClass == "Business" else 1)
 
     def create(self, validated_data):
         user = self.context['user']
@@ -97,7 +96,7 @@ class EditReservationsSerializer(serializers.ModelSerializer):
 
                 edit_flight_availableSeats(
                     flight, validated_data['number_seats'])
-                                
+
                 reserved_flight.save()
                 return reserved_flight
 
@@ -105,133 +104,29 @@ class EditReservationsSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {'error': ['flight does not exist.']}, 404)
 
-    # def update(self, instance, validated_data):
-    #     seats = validated_data['number_seats']
-    #     flightClass = validated_data['flightClass']
-    #     action = self.context.get('action')
-    #     flight_id = self.context['flight_id']
-    #     user = self.context['user']
-
-    #     print(validated_data)
-    #     try:
-    #         flight = Flight.objects.get(id=flight_id)
-    #         if (instance):
-    #             if action not in ('add', 'remove', 'edit'):
-    #                 raise serializers.ValidationError(
-    #                     {'error': "Action can only be 'add' or 'remove' or 'edit"}, code=400)
-
-    #             if action == 'add':
-    #                 instance.number_seats += seats
-    #                 # if (instance.number_seats > 15):
-    #                 # raise serializers.ValidationError(
-    #                 # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
-    #                 edit_flight_availableSeats(flight, seats)
-
-    #             elif action == 'remove' and instance.number_seats > 0:
-    #                 instance.number_seats -= seats
-    #                 flight.available_seats += seats
-    #                 flight.save()
-
-    #             elif action == 'edit':
-    #                 # if (seats > 15):
-    #                 # raise serializers.ValidationError(
-    #                 # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
-    #                 flight.available_seats += instance.number_seats
-    #                 edit_flight_availableSeats(flight, seats)
-    #                 instance.number_seats = seats
-
-    #             if (instance.number_seats == 0):
-    #                 if ((flight.traveling_date - timezone.now()) <= datetime.timedelta(days=2)):
-    #                     raise serializers.ValidationError(
-    #                         {'error': "Reservations can only be cancelled before 2 days"}, code=400)
-    #                 else:
-    #                     instance.delete()
-    #                     return instance
-    #         else:
-    #             instance = Flight_Reservation.objects.create(
-    #                 user_id=user, flight=flight, number_seats=validated_data['number_seats'])
-    #             edit_flight_availableSeats(
-    #                 flight, validated_data['number_seats'])
-
-    #         if (flightClass):
-    #             instance.flightClass = flightClass
-
-    #         intent = stripe.PaymentIntent.create(
-    #             amount=flight.ticket_price * seats *
-    #             (2 if instance.flightClass == "Business" else 1),
-    #             currency="egp",
-    #             metadata={'userid': user}
-    #         )
-
-    #         instance.save()
-    #         return {instance: instance, "cliend_secret": intent.client_secret}
-
-    #     except Flight.DoesNotExist:
-    #         raise serializers.ValidationError(
-    #             {'error': "Flight doesn't exist"}, code=422)
-
     def update(self, instance, validated_data):
-        action = self.context.get('action', None)
         flight_id = self.context.get('flight_id', None)
-        user = self.context.get('user', None)
-        seats = validated_data.get('number_seats', None)
-        flightClass = validated_data.get('flightClass', None)
+        status = validated_data.get('status', None)
+        payment_intent_id = validated_data.get('paymentId', None)
 
         try:
             flight = Flight.objects.get(id=flight_id)
-
-            if instance:
-                if action not in ('add', 'remove', 'edit'):
-                    raise serializers.ValidationError(
-                        {'error': "Action can only be 'add' or 'remove' or 'edit"}, code=400)
-
-                if action == 'add':
-                    instance.number_seats += seats
-                    # if (instance.number_seats > 15):
-                    # raise serializers.ValidationError(
-                    # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
-                    edit_flight_availableSeats(flight, seats)
-
-                elif action == 'remove' and instance.number_seats > 0:
-                    instance.number_seats -= seats
-                    flight.available_seats += seats
-                    flight.save()
-
-                elif action == 'edit':
-                    # if (seats > 15):
-                    # raise serializers.ValidationError(
-                    # {'error': "Number of reserved seats cannot be more than 15"}, code=400)
+            if (status):
+                instance.status = status
+                if (status == "cancelled"):
                     flight.available_seats += instance.number_seats
-                    edit_flight_availableSeats(flight, seats)
-                    instance.number_seats = seats
+                    instance.delete()
+                    return instance
 
-                if (instance.number_seats == 0):
-                    if ((flight.traveling_date - timezone.now()) <= datetime.timedelta(days=2)):
-                        raise serializers.ValidationError(
-                            {'error': "Reservations can only be cancelled before 2 days"}, code=400)
-                    else:
-                        instance.delete()
-                        return instance
-            else:
-                instance = Flight_Reservation.objects.create(
-                    user_id=user, flight=flight, number_seats=seats)
-                edit_flight_availableSeats(
-                    flight, seats)
+                if (status == "pending"):
+                    raise serializers.ValidationError(
+                        {'error': ['Invalid reservation']}, 400)
 
-            if (flightClass):
-                instance.flightClass = flightClass
-
-            intent = stripe.PaymentIntent.create(
-                amount=flight.ticket_price * seats *
-                (2 if instance.flightClass == "Business" else 1),
-                currency="egp",
-                metadata={'userid': user}
-            )
+            if (payment_intent_id):
+                instance.payment_intent_id = payment_intent_id
 
             instance.save()
-            instance_dict = model_to_dict(instance)
-            return {**instance_dict, "client_secret": intent.client_secret}
-            # return instance
+            return instance
 
         except Flight.DoesNotExist:
             raise serializers.ValidationError(

@@ -2,6 +2,7 @@
 # from django.views.generic.edit import CreateView, UpdateView, DeleteView
 # from django.urls import reverse_lazy
 from .models import StayReservation
+import stripe
 from rest_framework.response import Response
 # from rest_framework.exceptions import NotFound
 from rest_framework import status, generics
@@ -14,6 +15,13 @@ from rest_framework import status
 from datetime import datetime
 
 
+def get_payment_secret(price, user):
+    stripe.api_key = "sk_test_51NPVMMG8QYLQRO7Qd5iNUQuGPEVP2FizkQsgkCHgPpkkwh0TMe3UuvUnOFesiUaICB4HNQCKXj8lC7b94cGfliL300zU4d10fH"
+    intent = stripe.PaymentIntent.create(
+        amount=price,
+        currency="egp",
+        metadata={'userid': user.id})
+    return intent
 
 
 class ReservationList(generics.ListAPIView):
@@ -72,7 +80,9 @@ class CreateReservation(generics.ListCreateAPIView):
         )
         reservation.save()
         serializer = StayReservationSerializer(reservation)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({**serializer.data, "client_secret": get_payment_secret(all_price, user)}, status=status.HTTP_201_CREATED)
+    
 
     def get_price(self, room_type, number_of_days, number_of_rooms, room_price):
         if room_type == 'S':
