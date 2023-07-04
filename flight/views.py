@@ -15,14 +15,14 @@ from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
-stripe.api_key = settings.STRIPE_API_KEY
 
 def get_payment_secret(price, user):
+    stripe.api_key = "sk_test_51NPVMMG8QYLQRO7Qd5iNUQuGPEVP2FizkQsgkCHgPpkkwh0TMe3UuvUnOFesiUaICB4HNQCKXj8lC7b94cGfliL300zU4d10fH"
     intent = stripe.PaymentIntent.create(
         amount=price,
-        currency="egp",
+        currency="usd",
         metadata={'userid': user.id})
-    return intent.client_secret
+    return intent
 
 
 class ListFlightsView(generics.ListAPIView):
@@ -103,7 +103,7 @@ class ListFlight_ReservationsView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
+class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView, generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = EditReservationsSerializer
 
@@ -112,20 +112,27 @@ class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestr
         return Flight_Reservation.objects.filter(user_id=user_id)
 
     def post(self, request, pk, *args, **kwargs):
-        data = {"user_id": request.user.id, "flight": pk,
-                "number_seats": request.data["number_seats"], "flightClass": request.data["flightClass"]}
-        serializer = self.get_serializer(
-            data=data, context={"user": request.user, "flight_id": pk})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        price = serializer.data.get("total_price")
-        return Response({**serializer.data, "client_secret": get_payment_secret(price, request.user)}, status=status.HTTP_201_CREATED)
+        try:
+            data = {"user_id": request.user.id, "flight": pk,
+                    "number_seats": request.data["number_seats"], "flightClass": request.data["flightClass"]}
+            serializer = self.get_serializer(
+                data=data, context={"user": request.user, "flight_id": pk})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            price = serializer.data.get("total_price")
+            return Response({**serializer.data, "client_secret": get_payment_secret(price, request.user)}, status=status.HTTP_201_CREATED)
+        except:
+            return Response({"error": "something went wrong try again later"}, status=status.HTTP_404_NOT_FOUND)
 
-    def patch(self, request, pk, action, *args, **kwargs):
+    def patch(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_queryset().filter(flight=pk).first()
-            serializer = self.get_serializer(
-                instance, data=request.data, context={"action": action, "flight_id": pk, "user": request.user})
+            if instance:
+                serializer = self.get_serializer(
+                    instance, data=request.data, context={"flight_id": pk, "user": request.user}, partial=True)
+            else:
+                return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
