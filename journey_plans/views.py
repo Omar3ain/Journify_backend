@@ -22,7 +22,7 @@ def get_trip_plans(request):
         'destination':  last_stay.hotel.city + ',' + last_stay.hotel.countryId.code
     }
     headers = {
-        'X-RapidAPI-Key': '0690936387msha83dcad864a8b9ep1153b8jsncc728f419c2b',
+        'X-RapidAPI-Key': '41b767d072msh63f99161a4888edp14357ejsn57f6238b3e1a',
         'X-RapidAPI-Host': 'ai-trip-planner.p.rapidapi.com'
     }
     
