@@ -29,7 +29,7 @@ class PlaceInfo(View):
 
 # same used for search and popular places
 def get_popular_places(request):
-   # city_name = request.GET.get('city_name') or 'Paris'
+    city_name = request.GET.get('city_name') or 'Paris'
     radius = request.GET.get('radius', '5000')
     name = request.GET.get('name')
     kinds = request.GET.get('kinds')
@@ -40,7 +40,7 @@ def get_popular_places(request):
     # my_json_geo = geolocation.content.decode('utf8').replace("'", '"')
     # data = json.loads(my_json_geo)
     lat = request.GET.get('lat')
-    lon = request.GET.get('long')
+    lon = request.GET.get('lon')
 
     # make condition on route name
     rate = ''
