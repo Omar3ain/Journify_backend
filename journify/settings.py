@@ -111,7 +111,8 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 ALLOWED_HOSTS = [
-    'journify-backend.onrender.com'
+    'journify-backend.onrender.com',
+    'journfiy-backend-v2.onrender.com'
 ]
 
 TEMPLATES = [
