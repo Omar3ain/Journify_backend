@@ -11,7 +11,7 @@ async def fetch_details(session, xid, headers):
 async def get_data_async(params):
     url = 'https://opentripmap-places-v1.p.rapidapi.com/en/places/radius'
     headers = {
-        'X-RapidAPI-Key': '704287766amshc5b664ff1150592p1141b8jsn0d2300f0bb11',
+        'X-RapidAPI-Key': '0690936387msha83dcad864a8b9ep1153b8jsncc728f419c2b',
         'X-RapidAPI-Host': 'opentripmap-places-v1.p.rapidapi.com'
     }
 
