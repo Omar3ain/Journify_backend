@@ -137,7 +137,7 @@ class FlightReservationView(generics.CreateAPIView, generics.RetrieveUpdateDestr
             except Flight_Reservation.DoesNotExist:
                 return Response({"error": "Reservation doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
-    def destroy(self, request, pk, action=None, *args, **kwargs):
+    def destroy(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_queryset().get(flight=pk)
             flight = Flight.objects.get(id=pk)
