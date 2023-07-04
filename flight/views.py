@@ -20,7 +20,7 @@ def get_payment_secret(price, user):
     stripe.api_key = "sk_test_51NPVMMG8QYLQRO7Qd5iNUQuGPEVP2FizkQsgkCHgPpkkwh0TMe3UuvUnOFesiUaICB4HNQCKXj8lC7b94cGfliL300zU4d10fH"
     intent = stripe.PaymentIntent.create(
         amount=price,
-        currency="egp",
+        currency="usd",
         metadata={'userid': user.id})
     return intent
 
