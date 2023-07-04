@@ -130,4 +130,4 @@ class EditReservationsSerializer(serializers.ModelSerializer):
 
         except Flight.DoesNotExist:
             raise serializers.ValidationError(
-                {'error': "Flight doesn't exist"}, code=422)
+                {'error': "Flight doesn't exist"}, code=404)

@@ -30,11 +30,9 @@ class StayReservation(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled'),
     ], default='pending')
-
-
-
     
-
+    payment_intent_id = models.CharField(max_length=100, blank=True, null=True)
+    
 
     # def get_price(self):
     #     # all_price= self.price=(self.numberOfDays * self.numberOfRooms)
