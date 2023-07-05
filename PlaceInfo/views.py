@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views import View
 import requests
 from django.http import JsonResponse
-from country.views import get_geolocation
+# from country.views import get_geolocation
 import asyncio
 from recommendation.views import get_data_async
 import json
