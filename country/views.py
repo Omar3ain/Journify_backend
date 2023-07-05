@@ -4,7 +4,7 @@ from rest_framework import status
 from .models import Country
 from .serializers import CountrySerializer
 from django_countries.fields import CountryField
-from geopy.geocoders import Nominatim
+# from geopy.geocoders import Nominatim
 from django.http import JsonResponse
 
 
@@ -49,27 +49,27 @@ class CountryDetailAPIView(APIView):
 
 
 # get coordinates of a city or country using django-countries and geopy
-def get_geolocation(request, *args, **kwargs):
+# def get_geolocation(request, *args, **kwargs):
 
-    if request.method == 'GET':
-        city_name = request.GET.get('city_name') or 'Paris'
+#     if request.method == 'GET':
+#         city_name = request.GET.get('city_name') or 'Paris'
 
-    country = CountryField(name=city_name)
+#     country = CountryField(name=city_name)
 
-    # Use a geocoder (e.g., Nominatim) to fetch city coordinates
-    geolocator = Nominatim(user_agent="journify")
-    location = geolocator.geocode(country.name)
+#     # Use a geocoder (e.g., Nominatim) to fetch city coordinates
+#     geolocator = Nominatim(user_agent="journify")
+#     location = geolocator.geocode(country.name)
 
-    # Check if location exists and retrieve the latitude and longitude
-    geolocation = []
-    if location:
-        latitude = location.latitude
-        longitude = location.longitude
+#     # Check if location exists and retrieve the latitude and longitude
+#     geolocation = []
+#     if location:
+#         latitude = location.latitude
+#         longitude = location.longitude
 
-        geolocation.append({
-            'name': location.address,
-            'latitude': latitude,
-            'longitude': longitude
-        })
+#         geolocation.append({
+#             'name': location.address,
+#             'latitude': latitude,
+#             'longitude': longitude
+#         })
 
-    return JsonResponse({'latitude': latitude, 'longitude': longitude})
+#     return JsonResponse({'latitude': latitude, 'longitude': longitude})
